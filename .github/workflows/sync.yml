@@ -59,9 +59,11 @@ jobs:
         if: github.event.inputs.type == 'settings' || github.event.inputs.type == 'all'
         run: |
           gh api --silent -X PATCH /repos/${{ matrix.repo }} --input - <<< '{
+            "web_commit_signoff_required": true,
             "has_wiki": false,
             "has_projects": false,
             "delete_branch_on_merge": true,
+            "allow_update_branch": true,
             "allow_auto_merge": true,
             "allow_merge_commit": true,
             "allow_squash_merge": false,

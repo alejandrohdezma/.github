@@ -90,6 +90,17 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ steps.github_app.outputs.token }}
 
+      - name: Sync tag protection to ${{ matrix.repo }}
+        if: github.event.inputs.type == 'settings' || github.event.inputs.type == 'all'
+        run: |
+          has_protection=$(gh api /repos/${{ matrix.repo }}/tags/protection -q 'map(.pattern) | . as $f | "v*" | IN($f[])')
+
+          if [ "$has_protection" != "true" ]; then 
+            gh api -X POST /repos/${{ matrix.repo }}/tags/protection -f pattern='v*'
+          fi
+        env:
+          GITHUB_TOKEN: ${{ steps.github_app.outputs.token }}
+
       - name: Sync secrets to ${{ matrix.repo }}
         if: github.event.inputs.type == 'secrets' || github.event.inputs.type == 'all'
         run: |

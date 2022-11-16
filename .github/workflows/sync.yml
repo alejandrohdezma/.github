@@ -4,15 +4,20 @@ on:
   workflow_dispatch:
     inputs:
       type:
-        description: "Type of sync to perform: `settings`, `secrets` or `all`"
-        required: false
-        default: "all"
+        description: What type of sync do you want to perform?
+        required: true
+        default: 'all' 
+        type: choice
+        options:
+        - settings
+        - secrets
+        - all 
       repository:
         description: >
-          Repository to synchronize. Select `all` to sync every repo where the
-          alejandrohdezma-steward GitHub App is installed
+          Repository to synchronize. Leave empty to run this on every
+          repo where the alejandrohdezma-steward GitHub App is installed
         required: false
-        default: "all"
+        default: ""
 
 jobs:
   get-repositories:
@@ -30,7 +35,7 @@ jobs:
       - name: Select repositories to update
         id: repositories
         run: |
-          if [ "${{ github.event.inputs.repository }}" != "all" ]; then
+          if [ "${{ github.event.inputs.repository }}" != "" ]; then
             echo "::set-output name=repositories::[\"alejandrohdezma/${{ github.event.inputs.repository }}\"]"
           else
             echo "::set-output name=repositories::$(gh api installation/repositories -q '.repositories | map(.full_name)')"

@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       repository:
-        description: "Repository to update or `all` for updating every repository managed by the GitHub App"
+        description: "Repository to update. Leave empty to update every repository managed by the GitHub App."
         required: false
         default: ""
   schedule:
@@ -13,7 +13,7 @@ on:
 jobs:
   run-scala-steward-single-repository:
     name: Run Scala Steward in the selected repository
-    if: github.event_name == 'workflow_dispatch' && github.event.inputs.repository != 'all'
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.repository != ''
     runs-on: ubuntu-latest
     steps:
       - name: Checkout project
@@ -36,7 +36,7 @@ jobs:
 
   run-scala-steward-all-repos:
     name: Run Scala Steward in all the repositories managed by the GitHub App
-    if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.event.inputs.repository == 'all')
+    if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.event.inputs.repository == '')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout project

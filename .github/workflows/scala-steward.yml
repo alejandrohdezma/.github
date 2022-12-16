@@ -41,23 +41,9 @@ jobs:
       - name: Checkout project
         uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.2.0
 
-      - name: Get the GitHub App installation token
-        uses: alejandrohdezma/actions/github-app-token@v1
-        id: github_app
-        with:
-          token: ${{ secrets.GH_APP_TOKEN }}
-
-      - name: Create `repos.md`
-        run: |
-          gh api installation/repositories |
-            jq -r '.repositories | map(.full_name) | map(select(. != "alejandrohdezma/actions")) | .[] | "- " + .' > 'repos.md'
-        env:
-          GITHUB_TOKEN: ${{ steps.github_app.outputs.token }}
-
       - name: Launch Scala Steward on all repositories managed by the Github App
-        uses: scala-steward-org/scala-steward-action@588b69dc8208157655226feeccb465350063cb55 # v2.36.0
+        uses: scala-steward-org/scala-steward-action@snapshots/428
         with:
-          github-token: ${{ steps.github_app.outputs.token }}
-          author-email: 80571129+alejandrohdezma-steward[bot]@users.noreply.github.com
-          author-name: alejandrohdezma-steward[bot]
-          repos-file: repos.md
+          github-app-id: ${{ secrets.APP_ID }}
+          github-app-installation-id: ${{ secrets.APP_INSTALLATION_ID }}
+          github-app-key: ${{ secrets.APP_PRIVATE_KEY }}

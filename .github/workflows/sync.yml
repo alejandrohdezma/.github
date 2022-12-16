@@ -6,12 +6,12 @@ on:
       type:
         description: What type of sync do you want to perform?
         required: true
-        default: 'all' 
+        default: "all"
         type: choice
         options:
-        - settings
-        - secrets
-        - all 
+          - settings
+          - secrets
+          - all
       repository:
         description: >
           Repository to synchronize. Leave empty to run this on every
@@ -30,7 +30,7 @@ jobs:
         uses: alejandrohdezma/actions/github-app-token@v1
         id: github_app
         with:
-          token: ${{ secrets.GH_APP_TOKEN }}
+          token: ${{ secrets.MANAGEMENT_APP_TOKEN }}
 
       - name: Select repositories to update
         id: repositories
@@ -51,14 +51,12 @@ jobs:
       fail-fast: false
       matrix:
         repo: ${{ fromJson(needs.get-repositories.outputs.repositories) }}
-        exclude:
-          - repo: alejandrohdezma/alejandrohdezma
     steps:
       - name: Get the GitHub App installation token
         uses: alejandrohdezma/actions/github-app-token@v1
         id: github_app
         with:
-          token: ${{ secrets.GH_APP_TOKEN }}
+          token: ${{ secrets.MANAGEMENT_APP_TOKEN }}
 
       - name: Sync settings to ${{ matrix.repo }}
         if: github.event.inputs.type == 'settings' || github.event.inputs.type == 'all'

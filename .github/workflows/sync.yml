@@ -36,9 +36,9 @@ jobs:
         id: repositories
         run: |
           if [ "${{ github.event.inputs.repository }}" != "" ]; then
-            echo "::set-output name=repositories::[\"alejandrohdezma/${{ github.event.inputs.repository }}\"]"
+            echo "repositories=[\"alejandrohdezma/${{ github.event.inputs.repository }}\"]" >> $GITHUB_OUTPUT
           else
-            echo "::set-output name=repositories::$(gh api installation/repositories -q '.repositories | map(.full_name)')"
+            echo "repositories=$(gh api installation/repositories -q '.repositories | map(.full_name)')" >> $GITHUB_OUTPUT
           fi
         env:
           GITHUB_TOKEN: ${{ steps.github_app.outputs.token }}

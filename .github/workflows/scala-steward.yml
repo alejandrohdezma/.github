@@ -19,11 +19,11 @@ jobs:
       - name: Checkout project
         uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.2.0
 
-      - name: Launch Scala Steward on all repositories managed by the Github App
+      - name: Launch Scala Steward on ${{ github.event.inputs.repository }}
         uses: scala-steward-org/scala-steward-action@snapshots/428
         with:
           github-repository: alejandrohdezma/${{ github.event.inputs.repository }}
-          github-app-auth-only: 'true'
+          github-app-auth-only: "true"
           github-app-id: ${{ secrets.APP_ID }}
           github-app-installation-id: ${{ secrets.APP_INSTALLATION_ID }}
           github-app-key: ${{ secrets.APP_PRIVATE_KEY }}

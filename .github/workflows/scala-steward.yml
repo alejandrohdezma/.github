@@ -19,19 +19,14 @@ jobs:
       - name: Checkout project
         uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.2.0
 
-      - name: Get the GitHub App installation token
-        uses: alejandrohdezma/actions/github-app-token@v1
-        id: github_app
+      - name: Launch Scala Steward on all repositories managed by the Github App
+        uses: scala-steward-org/scala-steward-action@snapshots/428
         with:
-          token: ${{ secrets.GH_APP_TOKEN }}
-
-      - name: Launch Scala Steward in the selected repository
-        uses: scala-steward-org/scala-steward-action@588b69dc8208157655226feeccb465350063cb55 # v2.36.0
-        with:
-          github-token: ${{ steps.github_app.outputs.token }}
           github-repository: alejandrohdezma/${{ github.event.inputs.repository }}
-          author-email: 80571129+alejandrohdezma-steward[bot]@users.noreply.github.com
-          author-name: alejandrohdezma-steward[bot]
+          github-app-auth-only: 'true'
+          github-app-id: ${{ secrets.APP_ID }}
+          github-app-installation-id: ${{ secrets.APP_INSTALLATION_ID }}
+          github-app-key: ${{ secrets.APP_PRIVATE_KEY }}
 
   run-scala-steward-all-repos:
     name: Run Scala Steward in all the repositories managed by the GitHub App

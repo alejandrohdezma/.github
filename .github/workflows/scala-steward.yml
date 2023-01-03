@@ -23,7 +23,7 @@ jobs:
         with:
           app_id: ${{ secrets.APP_ID }}
           installation_id: ${{ secrets.APP_INSTALLATION_ID }}
-          private_key: ${{ secrets.PRIVATE_KEY }}
+          private_key: ${{ secrets.APP_PRIVATE_KEY }}
 
       - name: Select repositories to update
         id: repositories

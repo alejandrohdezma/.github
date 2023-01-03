@@ -49,7 +49,7 @@ jobs:
         uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.2.0
 
       - name: Launch Scala Steward on ${{ matrix.repo }}
-        uses: scala-steward-org/scala-steward-action@021df20e4b1f8860db2f775feff76718c3352f70 # v2.44.0
+        uses: scala-steward-org/scala-steward-action@snapshots/451 # v2.44.0
         with:
           github-repository: ${{ matrix.repo }}
           github-app-auth-only: "true"

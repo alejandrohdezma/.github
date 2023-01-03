@@ -11,34 +11,48 @@ on:
     - cron: "0 5 1,15 * *"
 
 jobs:
+  get-repositories:
+    name: Select repositories to update
+    runs-on: ubuntu-latest
+    outputs:
+      repositories: ${{ steps.repositories.outputs.repositories }}
+    steps:
+      - name: Generate token
+        id: github_app
+        uses: tibdex/github-app-token@021a2405c7f990db57f5eae5397423dcc554159c # v1.7.0
+        with:
+          app_id: ${{ secrets.APP_ID }}
+          installation_id: ${{ secrets.APP_INSTALLATION_ID }}
+          private_key: ${{ secrets.PRIVATE_KEY }}
+
+      - name: Select repositories to update
+        id: repositories
+        run: |
+          if [ "${{ github.event.inputs.repository }}" != "" ]; then
+            echo "repositories=[\"alejandrohdezma/${{ github.event.inputs.repository }}\"]" >> $GITHUB_OUTPUT
+          else
+            echo "repositories=$(gh api installation/repositories -q '.repositories | map(.full_name)')" >> $GITHUB_OUTPUT
+          fi
+        env:
+          GITHUB_TOKEN: ${{ steps.github_app.outputs.token }}
+
   run-scala-steward-single-repository:
-    name: Run Scala Steward in the selected repository
-    if: github.event_name == 'workflow_dispatch' && github.event.inputs.repository != ''
+    name: ${{ matrix.repo }} - Dependency update
     runs-on: ubuntu-latest
+    needs: get-repositories
+    strategy:
+      fail-fast: false
+      matrix:
+        repo: ${{ fromJson(needs.get-repositories.outputs.repositories) }}
     steps:
       - name: Checkout project
         uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.2.0
 
-      - name: Launch Scala Steward on ${{ github.event.inputs.repository }}
-        uses: scala-steward-org/scala-steward-action@snapshots/445 # v2.38.0
+      - name: Launch Scala Steward on ${{ matrix.repo }}
+        uses: scala-steward-org/scala-steward-action@8c4bb955dc71742275344b01087a2914497c25b1 # v2.43.0
         with:
-          github-repository: alejandrohdezma/${{ github.event.inputs.repository }}
+          github-repository: ${{ matrix.repo }}
           github-app-auth-only: "true"
-          github-app-id: ${{ secrets.APP_ID }}
-          github-app-installation-id: ${{ secrets.APP_INSTALLATION_ID }}
-          github-app-key: ${{ secrets.APP_PRIVATE_KEY }}
-
-  run-scala-steward-all-repos:
-    name: Run Scala Steward in all the repositories managed by the GitHub App
-    if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.event.inputs.repository == '')
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout project
-        uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.2.0
-
-      - name: Launch Scala Steward on all repositories managed by the Github App
-        uses: scala-steward-org/scala-steward-action@snapshots/445 # v2.38.0
-        with:
           github-app-id: ${{ secrets.APP_ID }}
           github-app-installation-id: ${{ secrets.APP_INSTALLATION_ID }}
           github-app-key: ${{ secrets.APP_PRIVATE_KEY }}

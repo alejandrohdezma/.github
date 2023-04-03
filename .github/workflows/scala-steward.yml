@@ -7,6 +7,13 @@ on:
         description: "Repository to update. Leave empty to update every repository managed by the GitHub App."
         required: false
         default: ""
+      extra-options:
+        description: >
+          Extra options to append to base `.scala-steward.conf`. For example, to instruct Scala Steward to just
+          update SBT you can set this to: `updates.allow += { groupId = "org.scala-sbt", artifactId = "sbt" }`
+          to just update SBT.
+        required: false
+        default: ""
   schedule:
     - cron: "0 5 1,15 * *"
 
@@ -47,6 +54,9 @@ jobs:
     steps:
       - name: Checkout project
         uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
+        
+      - name: Append extra options
+        run: echo "${{ github.event.inputs.extra-options }}" >> .github/.scala-steward.conf
 
       - name: Launch Scala Steward on ${{ matrix.repo }}
         uses: scala-steward-org/scala-steward-action@54a1bb56b4394addf0fc43f4806b7bfccb2bb7fa # v2.51.0

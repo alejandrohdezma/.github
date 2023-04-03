@@ -8,10 +8,21 @@ on:
         required: false
         default: ""
       extra-options:
-        description: >
-          Extra options to append to base `.scala-steward.conf`. For example, to instruct Scala Steward to just
-          update SBT you can set this to: `updates.allow = [{ groupId = "org.scala-sbt", artifactId = "sbt" }]`
-          to just update SBT.
+        description: |
+          Extra options to append to base
+          `.scala-steward.conf`. 
+          For example, to instruct Scala
+          Steward to just update SBT you
+          can set this to:
+          
+          updates.allow = [
+            {
+              groupId = "org.scala-sbt",
+              artifactId = "sbt"
+            }
+          ]
+          
+          to just update SBT
         required: false
         default: ""
   schedule:

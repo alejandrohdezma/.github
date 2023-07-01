@@ -59,7 +59,7 @@ jobs:
         run: echo "${{ github.event.inputs.extra-options }}" >> .github/.scala-steward.conf
 
       - name: Launch Scala Steward on ${{ matrix.repo }}
-        uses: scala-steward-org/scala-steward-action@364870a60b4405935ff74b17d77836a8db969f0a # v2.54.0
+        uses: scala-steward-org/scala-steward-action@09b7833ad0fd61d3a14c966ae40e8e636d79629e # v2.56.0
         with:
           github-repository: ${{ matrix.repo }}
           github-app-auth-only: "true"

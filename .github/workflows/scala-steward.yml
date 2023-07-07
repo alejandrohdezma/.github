@@ -61,7 +61,6 @@ jobs:
       - name: Launch Scala Steward on ${{ matrix.repo }}
         uses: scala-steward-org/scala-steward-action@2022b96af44ff0e0ea2cfc64e924fa406cdd7a47 # v2.59.0
         with:
-          scala-steward-version: 0.24.0-33-a3c0851a-SNAPSHOT
           github-repository: ${{ matrix.repo }}
           github-app-auth-only: "true"
           github-app-id: ${{ secrets.APP_ID }}

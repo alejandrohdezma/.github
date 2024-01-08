@@ -11,6 +11,7 @@ on:
         options:
           - settings
           - secrets
+          - variables
           - all
       repository:
         description: >
@@ -121,3 +122,8 @@ jobs:
           SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
           ADMIN_GITHUB_TOKEN: ${{ secrets.ADMIN_GITHUB_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.ADMIN_GITHUB_TOKEN }}
+
+      - name: Sync variables to ${{ matrix.repo }}
+        if: github.event.inputs.type == 'variables' || github.event.inputs.type == 'all'
+        run: |
+          gh variable set STEWARD_BOT -b"alejandrohdezma-steward[bot]" --repo ${{ matrix.repo }}

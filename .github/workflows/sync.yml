@@ -85,7 +85,9 @@ jobs:
                   "strict": true,
                   "contexts": [
                       "Run \"sbt ci-test\" on JDK 11",
-                      "Run \"sbt ci-test\" on JDK 17"
+                      "Run \"sbt ci-test\" on JDK 17",
+                      "Run \"sbt ci-test\" on JDK 21",
+                      "Run \"sbt ci-test\" on JDK 25"
                   ]
               },
               "enforce_admins": false,

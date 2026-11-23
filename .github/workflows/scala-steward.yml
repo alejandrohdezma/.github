@@ -53,13 +53,34 @@ jobs:
       matrix:
         repo: ${{ fromJson(needs.get-repositories.outputs.repositories) }}
     steps:
+      - name: Generate token
+        id: github_app
+        uses: tibdex/github-app-token@3beb63f4bd073e61482598c45c71c1019b59b73a # v2.1.0
+        with:
+          app_id: ${{ secrets.APP_ID }}
+          installation_retrieval_mode: id
+          installation_retrieval_payload: ${{ secrets.APP_INSTALLATION_ID }}
+          private_key: ${{ secrets.APP_PRIVATE_KEY }}
+
       - name: Checkout project
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-        
+
       - name: Append extra options
         run: echo "${{ github.event.inputs.extra-options }}" >> .github/.scala-steward.conf
 
+      - name: Check if repository uses sbt-dependencies
+        id: check_sbt_dependencies
+        run: |
+          if gh api "repos/${{ matrix.repo }}/contents/project/dependencies.conf" --silent 2>/dev/null; then
+            echo "uses_sbt_dependencies=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "uses_sbt_dependencies=false" >> "$GITHUB_OUTPUT"
+          fi
+        env:
+          GITHUB_TOKEN: ${{ steps.github_app.outputs.token }}
+
       - name: Launch Scala Steward on ${{ matrix.repo }}
+        if: steps.check_sbt_dependencies.outputs.uses_sbt_dependencies == 'false'
         uses: scala-steward-org/scala-steward-action@6162b21b93d4be314a61ce0462fd026630132fee # v2.96.0
         with:
           github-repository: ${{ matrix.repo }}
@@ -67,3 +88,32 @@ jobs:
           github-app-id: ${{ secrets.APP_ID }}
           github-app-installation-id: ${{ secrets.APP_INSTALLATION_ID }}
           github-app-key: ${{ secrets.APP_PRIVATE_KEY }}
+
+      - name: Copy the Scala Steward configuration out of the workspace
+        if: steps.check_sbt_dependencies.outputs.uses_sbt_dependencies == 'true'
+        run: cp .github/.scala-steward.conf "$RUNNER_TEMP/scala-steward.conf"
+
+      - name: Checkout ${{ matrix.repo }} at the workspace root
+        if: steps.check_sbt_dependencies.outputs.uses_sbt_dependencies == 'true'
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          repository: ${{ matrix.repo }}
+          token: ${{ steps.github_app.outputs.token }}
+
+      - name: Setup Java and sbt
+        if: steps.check_sbt_dependencies.outputs.uses_sbt_dependencies == 'true'
+        uses: coursier/setup-action@fd1707a76b027efdfb66ca79318b4d29b72e5a02 # v3.0.0
+        with:
+          jvm: liberica:17
+          apps: sbt
+
+      - name: Update dependencies using sbt-dependencies
+        if: steps.check_sbt_dependencies.outputs.uses_sbt_dependencies == 'true'
+        uses: alejandrohdezma/sbt-dependencies@8553131c34cff510161152bceed097793a2ac920 # v0.46.0
+        with:
+          config-file: ${{ runner.temp }}/scala-steward.conf
+          github-token: ${{ steps.github_app.outputs.token }}
+          pr-body: |
+            Dependency updates from `sbt updateAllDependencies`.
+
+            Workflow run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}

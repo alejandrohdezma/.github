@@ -63,7 +63,7 @@ jobs:
           private_key: ${{ secrets.APP_PRIVATE_KEY }}
 
       - name: Checkout project
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Append extra options
         run: echo "${{ github.event.inputs.extra-options }}" >> .github/.scala-steward.conf
@@ -95,7 +95,7 @@ jobs:
 
       - name: Checkout ${{ matrix.repo }} at the workspace root
         if: steps.check_sbt_dependencies.outputs.uses_sbt_dependencies == 'true'
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: ${{ matrix.repo }}
           token: ${{ steps.github_app.outputs.token }}
